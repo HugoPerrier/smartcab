@@ -46,7 +46,7 @@ class LearningAgent(Agent):
         else:
             self.epsilon = self.epsilon - 0.05
             self.n_sim += 1
-            #self.epsilon = pow(0.95, self.n_sim)
+            #self.epsilon = pow(0.97, self.n_sim)
             #self.epsilon = math.exp(- 0.01 * self.n_sim)
             
             #self.alpha = 0.3
@@ -72,7 +72,8 @@ class LearningAgent(Agent):
         #   For each action, set the Q-value for the state-action pair to 0
         
         #state = (waypoint, inputs['light'], inputs['left'], inputs['right'], inputs['oncoming'], deadline)
-        state = (waypoint, inputs['light'], inputs['left'], inputs['right'], inputs['oncoming'])
+        #state = (waypoint, inputs['light'], inputs['left'], inputs['right'], inputs['oncoming'])
+        state = (waypoint, inputs['light'], inputs['left'], inputs['oncoming'])
         #state = (inputs['light'], inputs['left'], inputs['right'], inputs['oncoming'])
 
         return state
@@ -86,8 +87,12 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Calculate the maximum Q-value of all actions for a given state
+        maxQ = -99999999.99
 
-        maxQ = max(self.Q[state].iterkeys(), key=(lambda key: self.Q[state][key]))
+        for action in self.Q[state]:
+            maxQ = max(maxQ, self.Q[state][action])
+        
+        #maxQ = self.Q(max(self.Q[state].iterkeys(), key=(lambda key: self.Q[state][key])))
 
         return maxQ 
 
@@ -135,7 +140,10 @@ class LearningAgent(Agent):
             if (random.random() < self.epsilon):
                 action = random.choice(Environment.valid_actions)
             else:
-                action = self.get_maxQ(state)
+                maxQ = self.get_maxQ(state)
+                for act in self.Q[state]:
+                    if (self.Q[state][act] == maxQ):
+                        action = act
  
         return action
 
